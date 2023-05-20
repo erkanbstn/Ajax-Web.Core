@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+<h1>Ajax Simple List</h1>
+<input id="pId" type="text" />
+<button id="showBtn">Show Item</button>
+<button id="updateBtn">Update Item</button>
+<button id="addBtn">Add Item</button>
+
+<div id="productDetail" style="display:none !important;">
+    <h3>Show Div!</h3>
+    <div id="productDetailContent">
+        <div class="row">
+            <div class="col-md-12">
+                <form>
+                    <input type="hidden" id="productId" />
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" class="form-control" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="testtable" class="table table-hover">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>City</th>
+        <th>Age</th>
+    </tr>
+    <tbody id="ajaxtr">
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+
+            $("#updateBtn").click(function () {
+                let products = {
+                    Id: $("#pId").val(),
+                    Name: $("#productName").val()
+                };
+                $.ajax({
+                    url: "/TestAjax/UpdateProduct",
+                    type: "post",
+                    data: products,
+                    //contentType: false,
+                    //processData: false,
+                    success: function (data) {
+                        let result = jQuery.parseJSON(data);
+                        alert(result.Name);
+                    }
+                });
+            });
+
+
+            $("#addBtn").click(x => {
+                let products = {
+                    Name: $("#productName").val()
+                };
+                $.ajax({
+                    url: "/TestAjax/AddProduct",
+                    type: "POST",
+                    data: products,
+                    success: function (data) {
+                        let result = jQuery.parseJSON(data);
+                        alert(result.Name);
+                    }
+
+                });
+            });
+
+            $("#showBtn").click(function () {
+                let productId = $("#pId").val();
+                $.ajax({
+
+                    url: "/TestAjax/GetProductById",
+                    data: { id: productId },
+                    contentType: "application/json; charset=utf-8;",
+                    dataType: "json",
+                    type: "get",
+                    success: function (data) {
+                        var convertObject = jQuery.parseJSON(data);
+                        $("#productDetail").fadeIn(500);/*css("display","block");*/
+                        $("#productName").val(convertObject.Name);
+                    },
+                    error: function () {
+                        alert("Id is Not Found!");
+                    }
+
+                })
+            });
+            $.ajax({
+                url: "GetProduct",
+                contenttype: "application/json; charset=utf-8;",
+                type: "GET",
+                success: function (data) {
+                    var convertObject = jQuery.parseJSON(data);
+                    $.each(convertObject, (index, value) => {
+                        $("#ajaxtr").append("<tr>" + "<td> " + value.Id +
+                            " </td>" + "<td>" + value.Name +
+                            "</td > " + " <td> " + value.City +
+                            " </td>" + "<td>" + value.Age + " </td>"
+                            + "</tr>");
+                        console.log(value.Age);
+                    });
+                }
+            });
+        });
+    </script>
+}
+
